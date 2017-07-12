@@ -99,7 +99,7 @@ class Marshal (object):
 				# Retry in 5 seconds
 				reactor.callLater(5, self.connect)
 			else:
-				print failure
+				print(failure)
 
 		if self.connected:
 			return
@@ -110,7 +110,7 @@ class Marshal (object):
 
 	def register (self):
 		def register_failed (failure):
-			print "Registration failed: " + str(failure)
+			print("Registration failed: " + str(failure))
 
 		return self.marshal.callRemote(
 			"register", 
@@ -127,15 +127,15 @@ class Marshal (object):
 			self._send()
 
 		def failed (failure, events):
-			print "Event send failed"
+			print("Event send failed")
 
 			f = failure.check(pb.PBConnectionLost)
 
 			if f is pb.PBConnectionLost:
-				print "Reconnecting"
+				print("Reconnecting")
 				retry(events)
 			else:
-				print failure
+				print(failure)
 
 		def retry (events):
 			self._eventQueue[:0] = events
@@ -166,7 +166,7 @@ class Marshal (object):
 			self.sending = True
 
 		except pb.DeadReferenceError:
-			print "Disconnected from Marshal, reconnecting"
+			print("Disconnected from Marshal, reconnecting")
 			retry(events)
 
 	def event (self, type, data):
@@ -181,7 +181,7 @@ class Marshal (object):
 		self._eventQueue.append(ev)
 		self.eventHistory.append(ev)
 
-		print "Event: " + repr(ev)
+		print("Event: " + repr(ev))
 
 		if self.sending is False:
 			self._send()
@@ -253,7 +253,7 @@ class _RemoteWrapper (object, pb.Referenceable):
 			"zero": round(start, 1),
 			"max": round(interval, 1),
 			"data": [
-				map(compress, self.experiment.interface.properties[x].get(start, interval, step))
+				list(map(compress, self.experiment.interface.properties[x].get(start, interval, step)))
 				for x in streams
 			]
 		}

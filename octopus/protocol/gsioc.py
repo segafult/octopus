@@ -380,7 +380,7 @@ class Receiver (LineReceiver):
 					return d.addCallback(send_char, char)
 
 			try:
-				char = string.next()
+				char = next(string)
 				# TODO: This may possibly run into call stack overflows...
 				# Maybe replace with callLater?
 				return self._write(char).addCallback(send_char, char)
@@ -407,7 +407,7 @@ class FIFOStream (Stream):
 					try:
 						self._update(buffer, now() - send_time)
 						return True
-					except TypeError, e:
+					except TypeError as e:
 						# Has not been properly reset
 						try:
 							def cb (result):
@@ -621,7 +621,7 @@ def _decompress (compressed_data, current_value = None):
 
 	try:
 		while 1:
-			code = ord(chars.next())
+			code = ord(next(chars))
 
 			if 35 < code < 52:
 				values.extend([current_value] * (code - 35))
@@ -634,9 +634,9 @@ def _decompress (compressed_data, current_value = None):
 				current_value = _add(current_value, code - 97)
 				values.append(current_value)
 			elif 115 < code < 120:
-				code2 = ord(chars.next())
-				code3 = ord(chars.next())
-				code4 = ord(chars.next())
+				code2 = ord(next(chars))
+				code3 = ord(next(chars))
+				code4 = ord(next(chars))
 				current_value = \
 					((code - 116) * 262114) + \
 					((code2 - 36) * 4096) + \

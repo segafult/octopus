@@ -12,8 +12,8 @@ from exceptions import IndexError
 import re
 
 # Sibling Imports
-from error import Error, NotRunning, AlreadyRunning, NotPaused, Stopped
-import util
+from .error import Error, NotRunning, AlreadyRunning, NotPaused, Stopped
+from . import util
 
 # Package Imports
 from ..util import now, EventEmitter
@@ -50,7 +50,7 @@ class Step (util.BaseStep, EventEmitter):
 		self.emit("state-changed", item = self, state = value)
 
 	def __init__ (self, expr = None):
-		self.id = _counter.next()
+		self.id = next(_counter)
 		self.complete = defer.Deferred()
 		self.dependents = util.Dependents()
 
@@ -278,7 +278,7 @@ class _StepWithLoop (util.Looping, _StepWithChild):
 			# Stops execution of child step
 			try:
 				return defer.maybeDeferred(_StepWithChild._cancel, self, abort)
-			except NotRunning, Stopped:
+			except NotRunning as Stopped:
 				pass
 		else:
 			# Allows child step to finish normally
@@ -338,7 +338,7 @@ class Sequence (_StepWithChildren):
 				return None
 			else:
 				try:
-					step = iterator.next()
+					step = next(iterator)
 				except StopIteration:
 					self._complete(result)
 				else:
@@ -448,7 +448,7 @@ class CancelStep (Step):
 
 		try:
 			self._step.cancel()
-		except NotRunning, Stopped:
+		except NotRunning as Stopped:
 			pass
 
 		return self._complete()
@@ -657,7 +657,7 @@ class CallStep (util.Caller, Step):
 		try:
 			d2 = util.Caller._cancel(self, abort)
 			return defer.gatherResults([d, d2])
-		except AttributeError, NotRunning:
+		except AttributeError as NotRunning:
 			return d
 
 	def _reset (self):

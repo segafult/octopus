@@ -6,7 +6,7 @@ import operator
 from ..util import now, timerange, EventEmitter
 
 # Sibling Imports
-import errors
+from . import errors
 
 
 def _upper_bound (list, time):
@@ -54,7 +54,7 @@ def _get (x_vals, y_vals, x_max, x_min, start, interval):
 
 	# Return all data
 	if start is None and interval is None:
-		return zip(x_vals, y_vals)
+		return list(zip(x_vals, y_vals))
 
 	if interval is None:
 		interval = 0
@@ -84,7 +84,7 @@ def _get (x_vals, y_vals, x_max, x_min, start, interval):
 	if i_end is not None:
 		i_end += 1 # Return the interval length of data
 
-	vals = zip(x_vals[i_start:i_end], y_vals[i_start:i_end])
+	vals = list(zip(x_vals[i_start:i_end], y_vals[i_start:i_end]))
 
 	# Fill in the start and end points if necessary.
 	try:
@@ -258,7 +258,7 @@ class BaseVariable (EventEmitter):
 	def __float__ (self):
 		return float(self.get_value())
 
-	def __nonzero__ (self):
+	def __bool__ (self):
 		return bool(self.get_value())
 
 	def __repr__ (self):
@@ -284,7 +284,7 @@ class Variable (BaseVariable):
 		self._x = []
 		self._y = []
 
-		if type in (int, float, long, complex):
+		if type in (int, float, int, complex):
 			self._archive = Archive()
 		else:
 			self._archive = StringArchive(self)
@@ -522,7 +522,7 @@ def _def_binary_op (symbol, operatorFn):
 
 	def get_archive (self, store = True):
 		if self._archive_x is not None:
-			return zip(self._archive_x, self._archive_y)
+			return list(zip(self._archive_x, self._archive_y))
 
 		x = []
 		y = []
@@ -567,7 +567,7 @@ def _def_binary_op (symbol, operatorFn):
 			self._archive_x = x
 			self._archive_y = y
 
-		return zip(x, y)
+		return list(zip(x, y))
 		
 	def serialize (self):
 		return "(" + \
@@ -635,7 +635,7 @@ def _def_unary_op (symbol, operatorFn):
 
 	def get_archive (self, store = True):
 		if self._archive_x is not None:
-			return zip(self._archive_x, self._archive_y)
+			return list(zip(self._archive_x, self._archive_y))
 
 		x = []
 		y = []
@@ -653,7 +653,7 @@ def _def_unary_op (symbol, operatorFn):
 			self._archive_x = x
 			self._archive_y = y
 
-		return zip(x, y)
+		return list(zip(x, y))
 
 	def serialize (self):
 		return symbol + self._operand.serialize()

@@ -35,13 +35,13 @@ class K120LineReceiver (QueuedLineReceiver):
 
 	def unexpectedMessage (self, line):
 		if line == "H":
-			print "Pump stopped due to an external stop signal"
+			print("Pump stopped due to an external stop signal")
 		elif line == "R":
-			print "External stop signal removed"
+			print("External stop signal removed")
 		elif line == "E1":
-			print "Motor blocked error"
+			print("Motor blocked error")
 		elif line == "E2":
-			print "Manual stop attempt ignored"
+			print("Manual stop attempt ignored")
 
 
 class K120 (Machine):
@@ -97,7 +97,7 @@ class K120 (Machine):
 
 		def interpretFlowrate (result):
 			if result[0] is not "F":
-				print "Knauer Error: F? = %s" % result 
+				print("Knauer Error: F? = %s" % result) 
 				return
 
 			target = float(result[1:]) * 1000

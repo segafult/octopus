@@ -5,7 +5,7 @@ import os
 from twisted.internet import reactor, defer
 
 # Sibling Imports
-import sequence as s
+from . import sequence as s
 from ..data import Variable
 
 # To implement:
@@ -21,19 +21,19 @@ def parallel (*steps):
 
 def set (var, expr):
 	if not isinstance(var, Variable):
-		raise 'set(): first argument must be a Variable'
+		raise Exception('set(): first argument must be a Variable')
 
 	return s.SetStep(var, expr)
 
 def increment (var):
 	if not isinstance(var, Variable):
-		raise 'increment(): argument must be a Variable'
+		raise Exception('increment(): argument must be a Variable')
 
 	return s.SetStep(var, var + 1)
 
 def decrement (var):
 	if not isinstance(var, Variable):
-		raise 'increment(): argument must be a Variable'
+		raise Exception('increment(): argument must be a Variable')
 
 	return s.SetStep(var, var - 1)
 

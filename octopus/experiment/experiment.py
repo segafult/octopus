@@ -16,7 +16,7 @@ from ..machine import Machine, Component
 from ..machine.interface import InterfaceSection, InterfaceSectionSet
 from ..constants import Event, State
 
-from marshal import Marshal
+from .marshal import Marshal
 
 class LogFile (object):
 
@@ -352,7 +352,7 @@ class Experiment (object):
 
 			self._log_variables.update(self.interface.properties)
 
-		items = self._log_variables.iteritems()
+		items = iter(self._log_variables.items())
 
 		for key, var in items:
 			try:
@@ -379,7 +379,7 @@ class Experiment (object):
 	def stop_logging (self):
 		self._logging = False
 
-		items = self._log_variables.iteritems()
+		items = iter(self._log_variables.items())
 
 		for key, var in items:
 			try:

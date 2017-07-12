@@ -2,8 +2,8 @@
 from twisted.internet import defer
 
 # System Imports
-import StringIO
-import urllib
+import io
+import urllib.request, urllib.parse, urllib.error
 from time import time as now
 
 # Package Imports
@@ -41,10 +41,10 @@ class BaseImage (BaseVariable):
 		pass
 
 	def __str__ (self):
-		output = StringIO.StringIO()
+		output = io.StringIO()
 		img = self.get_value()
 		img.scale(0.25).getPIL().save(output, format = "PNG")
-		encoded = "data:image/png;base64," + urllib.quote(output.getvalue().encode('base64'))
+		encoded = "data:image/png;base64," + urllib.parse.quote(output.getvalue().encode('base64'))
 
 		return encoded
 

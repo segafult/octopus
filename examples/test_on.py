@@ -4,7 +4,7 @@ from twisted.internet import reactor
 
 
 def fn ():
-	print "fn called"
+	print("fn called")
 	return sequence(
 		log("fn called"),
 		set(v, False)

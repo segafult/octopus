@@ -9,7 +9,7 @@ class Layout (object):
 	name = "Layout"
 
 	def __init__ (self, **kwargs):
-		for k, v in kwargs.iteritems():
+		for k, v in kwargs.items():
 			if hasattr (self, k):
 				setattr(self, k, v)
 
@@ -49,7 +49,7 @@ class GridLayout (Layout):
 		return (x, y, self.z_down)
 
 	def vials (self):
-		return range(1, 1 + max)
+		return list(range(1, 1 + max))
 
 grid_layout_50 = GridLayout(name = "10x5", z_up = 0, z_down = 500, x_count = 10, x_zero = 100, y_zero = 100, dx = 100, dy = 100)
 
@@ -91,7 +91,7 @@ def fourteen_vial_rack (position, for_injection = False):
 		return (x, y, z)
 
 	def vials ():
-		return range(1, 15)
+		return list(range(1, 15))
 
 	layout.xyz = xyz
 	layout.vials = vials

@@ -1,0 +1,908 @@
+--- examples/test_dep.py	(original)
++++ examples/test_dep.py	(refactored)
+@@ -12,19 +12,19 @@
+ 		self.i = i
+ 
+ 	def _run (self):
+-		print "Dep %d Run" % self.i
++		print("Dep %d Run" % self.i)
+ 
+ 	def _pause (self):
+-		print "Dep %d Pause" % self.i
++		print("Dep %d Pause" % self.i)
+ 
+ 	def _resume (self):
+-		print "Dep %d Resume" % self.i
++		print("Dep %d Resume" % self.i)
+ 
+ 	def _cancel (self, abort = False):
+-		print "Dep %d Cancel" % self.i
++		print("Dep %d Cancel" % self.i)
+ 
+ 	def _reset (self):
+-		print "Dep %d Reset" % self.i
++		print("Dep %d Reset" % self.i)
+ 
+ e = r._experiment
+ d1 = MyD(1)
+--- examples/test_on.py	(original)
++++ examples/test_on.py	(refactored)
+@@ -4,7 +4,7 @@
+ 
+ 
+ def fn ():
+-	print "fn called"
++	print("fn called")
+ 	return sequence(
+ 		log("fn called"),
+ 		set(v, False)
+--- examples/test_tick.py	(original)
++++ examples/test_tick.py	(refactored)
+@@ -5,7 +5,7 @@
+ from octopus.sequence.util import Tick
+ 
+ def fn1 ():
+-	print "d3 tick."
++	print("d3 tick.")
+ 
+ def fn2 ():
+ 	return log("d4 tick...")
+--- octopus/__main__.py	(original)
++++ octopus/__main__.py	(refactored)
+@@ -1,5 +1,5 @@
+ 
+ # Run a standard console if invoked
+ if __name__ == '__main__':
+-	import console
++	from . import console
+ 	console.run()
+--- octopus/runtime.py	(original)
++++ octopus/runtime.py	(refactored)
+@@ -5,13 +5,13 @@
+ from twisted.internet import reactor, defer
+ 
+ # Sibling Imports
+-from sequence import Step
+-import data
+-import experiment
+-from machine import Machine, ui as machine_ui
+-import util
++from .sequence import Step
++from . import data
++from . import experiment
++from .machine import Machine, ui as machine_ui
++from . import util
+ 
+-from sequence.shortcuts import *
++from .sequence.shortcuts import *
+ 
+ _experiment = experiment.Experiment()
+ 
+--- octopus/data/__init__.py	(original)
++++ octopus/data/__init__.py	(refactored)
+@@ -1,4 +1,4 @@
+-from data import Variable, Constant
+-import errors
+-import control
+-import manipulation
++from .data import Variable, Constant
++from . import errors
++from . import control
++from . import manipulation
+--- octopus/data/control.py	(original)
++++ octopus/data/control.py	(refactored)
+@@ -14,7 +14,7 @@
+ from ..util import Event
+ 
+ # Sibling Imports
+-import errors
++from . import errors
+ 
+ class Control (object):
+ 	_counter = 0
+@@ -146,10 +146,10 @@
+ 			return self._options
+ 
+ 		if hasattr("options", self._variable):
+-			return dict(zip(
++			return dict(list(zip(
+ 				self._variable.options,
+ 				[s.capitalize() for s in self._variable.options]
+-			))
++			)))
+ 
+ 	@options.setter
+ 	def options (self, value):
+--- octopus/data/data.py	(original)
++++ octopus/data/data.py	(refactored)
+@@ -6,7 +6,7 @@
+ from ..util import now, timerange, EventEmitter
+ 
+ # Sibling Imports
+-import errors
++from . import errors
+ 
+ 
+ def _upper_bound (list, time):
+@@ -54,7 +54,7 @@
+ 
+ 	# Return all data
+ 	if start is None and interval is None:
+-		return zip(x_vals, y_vals)
++		return list(zip(x_vals, y_vals))
+ 
+ 	if interval is None:
+ 		interval = 0
+@@ -84,7 +84,7 @@
+ 	if i_end is not None:
+ 		i_end += 1 # Return the interval length of data
+ 
+-	vals = zip(x_vals[i_start:i_end], y_vals[i_start:i_end])
++	vals = list(zip(x_vals[i_start:i_end], y_vals[i_start:i_end]))
+ 
+ 	# Fill in the start and end points if necessary.
+ 	try:
+@@ -258,7 +258,7 @@
+ 	def __float__ (self):
+ 		return float(self.get_value())
+ 
+-	def __nonzero__ (self):
++	def __bool__ (self):
+ 		return bool(self.get_value())
+ 
+ 	def __repr__ (self):
+@@ -284,7 +284,7 @@
+ 		self._x = []
+ 		self._y = []
+ 
+-		if type in (int, float, long, complex):
++		if type in (int, float, int, complex):
+ 			self._archive = Archive()
+ 		else:
+ 			self._archive = StringArchive(self)
+@@ -522,7 +522,7 @@
+ 
+ 	def get_archive (self, store = True):
+ 		if self._archive_x is not None:
+-			return zip(self._archive_x, self._archive_y)
++			return list(zip(self._archive_x, self._archive_y))
+ 
+ 		x = []
+ 		y = []
+@@ -567,7 +567,7 @@
+ 			self._archive_x = x
+ 			self._archive_y = y
+ 
+-		return zip(x, y)
++		return list(zip(x, y))
+ 		
+ 	def serialize (self):
+ 		return "(" + \
+@@ -635,7 +635,7 @@
+ 
+ 	def get_archive (self, store = True):
+ 		if self._archive_x is not None:
+-			return zip(self._archive_x, self._archive_y)
++			return list(zip(self._archive_x, self._archive_y))
+ 
+ 		x = []
+ 		y = []
+@@ -653,7 +653,7 @@
+ 			self._archive_x = x
+ 			self._archive_y = y
+ 
+-		return zip(x, y)
++		return list(zip(x, y))
+ 
+ 	def serialize (self):
+ 		return symbol + self._operand.serialize()
+--- octopus/data/manipulation.py	(original)
++++ octopus/data/manipulation.py	(refactored)
+@@ -2,7 +2,7 @@
+ import math
+ 
+ # Sibling Imports
+-import data
++from . import data
+ 
+ # NumPy
+ import numpy as np
+@@ -52,9 +52,9 @@
+ 		y_vals = self.interp(start, interval, step)
+ 
+ 		try:
+-			return zip(x_vals.tolist(), y_vals.tolist())
+-		except TypeError, ValueError:
+-			return zip(x_vals.tolist(), [None] * len(x_vals))
++			return list(zip(x_vals.tolist(), y_vals.tolist()))
++		except TypeError as ValueError:
++			return list(zip(x_vals.tolist(), [None] * len(x_vals)))
+ 
+ 	def interp (self, start, interval, step):
+ 		raise NotImplementedError
+--- octopus/data/test/test_data.py	(original)
++++ octopus/data/test/test_data.py	(refactored)
+@@ -22,7 +22,7 @@
+ 		# Get all data
+ 		self.assertEqual(
+ 			data._get(self.x, self.y, self.max_x, self.min_x, None, None), 
+-			zip(self.x, self.y)
++			list(zip(self.x, self.y))
+ 		)
+ 
+ 		# Zero interval
+--- octopus/experiment/__init__.py	(original)
++++ octopus/experiment/__init__.py	(refactored)
+@@ -1,2 +1,2 @@
+-from marshal import Marshal
+-from experiment import Experiment, LogFile, Variable, Timer
++from .marshal import Marshal
++from .experiment import Experiment, LogFile, Variable, Timer
+--- octopus/experiment/experiment.py	(original)
++++ octopus/experiment/experiment.py	(refactored)
+@@ -16,7 +16,7 @@
+ from ..machine.interface import InterfaceSection, InterfaceSectionSet
+ from ..constants import Event, State
+ 
+-from marshal import Marshal
++from .marshal import Marshal
+ 
+ class LogFile (object):
+ 
+@@ -352,7 +352,7 @@
+ 
+ 			self._log_variables.update(self.interface.properties)
+ 
+-		items = self._log_variables.iteritems()
++		items = iter(self._log_variables.items())
+ 
+ 		for key, var in items:
+ 			try:
+@@ -379,7 +379,7 @@
+ 	def stop_logging (self):
+ 		self._logging = False
+ 
+-		items = self._log_variables.iteritems()
++		items = iter(self._log_variables.items())
+ 
+ 		for key, var in items:
+ 			try:
+--- octopus/experiment/marshal.py	(original)
++++ octopus/experiment/marshal.py	(refactored)
+@@ -99,7 +99,7 @@
+ 				# Retry in 5 seconds
+ 				reactor.callLater(5, self.connect)
+ 			else:
+-				print failure
++				print(failure)
+ 
+ 		if self.connected:
+ 			return
+@@ -110,7 +110,7 @@
+ 
+ 	def register (self):
+ 		def register_failed (failure):
+-			print "Registration failed: " + str(failure)
++			print("Registration failed: " + str(failure))
+ 
+ 		return self.marshal.callRemote(
+ 			"register", 
+@@ -127,15 +127,15 @@
+ 			self._send()
+ 
+ 		def failed (failure, events):
+-			print "Event send failed"
++			print("Event send failed")
+ 
+ 			f = failure.check(pb.PBConnectionLost)
+ 
+ 			if f is pb.PBConnectionLost:
+-				print "Reconnecting"
++				print("Reconnecting")
+ 				retry(events)
+ 			else:
+-				print failure
++				print(failure)
+ 
+ 		def retry (events):
+ 			self._eventQueue[:0] = events
+@@ -166,7 +166,7 @@
+ 			self.sending = True
+ 
+ 		except pb.DeadReferenceError:
+-			print "Disconnected from Marshal, reconnecting"
++			print("Disconnected from Marshal, reconnecting")
+ 			retry(events)
+ 
+ 	def event (self, type, data):
+@@ -181,7 +181,7 @@
+ 		self._eventQueue.append(ev)
+ 		self.eventHistory.append(ev)
+ 
+-		print "Event: " + repr(ev)
++		print("Event: " + repr(ev))
+ 
+ 		if self.sending is False:
+ 			self._send()
+@@ -253,7 +253,7 @@
+ 			"zero": round(start, 1),
+ 			"max": round(interval, 1),
+ 			"data": [
+-				map(compress, self.experiment.interface.properties[x].get(start, interval, step))
++				list(map(compress, self.experiment.interface.properties[x].get(start, interval, step)))
+ 				for x in streams
+ 			]
+ 		}
+--- octopus/image/data.py	(original)
++++ octopus/image/data.py	(refactored)
+@@ -2,8 +2,8 @@
+ from twisted.internet import defer
+ 
+ # System Imports
+-import StringIO
+-import urllib
++import io
++import urllib.request, urllib.parse, urllib.error
+ from time import time as now
+ 
+ # Package Imports
+@@ -41,10 +41,10 @@
+ 		pass
+ 
+ 	def __str__ (self):
+-		output = StringIO.StringIO()
++		output = io.StringIO()
+ 		img = self.get_value()
+ 		img.scale(0.25).getPIL().save(output, format = "PNG")
+-		encoded = "data:image/png;base64," + urllib.quote(output.getvalue().encode('base64'))
++		encoded = "data:image/png;base64," + urllib.parse.quote(output.getvalue().encode('base64'))
+ 
+ 		return encoded
+ 
+--- octopus/image/image.py	(original)
++++ octopus/image/image.py	(refactored)
+@@ -1,5 +1,5 @@
+ # Sibling Imports
+-from data import Image
++from .data import Image
+ 
+ # Package Imports
+ from ..machine import Machine, ui
+--- octopus/image/provider.py	(original)
++++ octopus/image/provider.py	(refactored)
+@@ -1,5 +1,5 @@
+ # Sibling Imports
+-from data import Image
++from .data import Image
+ 
+ # Package Imports
+ from ..machine import Machine, ui
+--- octopus/image/source.py	(original)
++++ octopus/image/source.py	(refactored)
+@@ -31,7 +31,7 @@
+ 		i = yield threads.deferToThread(self.camera.getImage)
+ 
+ 		if i is None:
+-			print "No image"
++			print("No image")
+ 
+ 		defer.returnValue(i)
+ 
+@@ -61,7 +61,7 @@
+ 		i = self.camera.getImage()
+ 
+ 		if i is None:
+-			print "No image"
++			print("No image")
+ 
+ 		return i
+ 
+@@ -96,7 +96,7 @@
+ 			return
+ 
+ 		if flag is False:
+-			print "No image"
++			print("No image")
+ 			return
+ 
+ 		defer.returnValue(SimpleCV.Image(
+--- octopus/image/tracker.py	(original)
++++ octopus/image/tracker.py	(refactored)
+@@ -6,7 +6,7 @@
+ from time import time as now
+ 
+ # Sibling Imports
+-from data import Image, DerivedImage
++from .data import Image, DerivedImage
+ 
+ # Package Imports
+ from ..machine import Machine, Property, Stream, ui
+--- octopus/machine/__init__.py	(original)
++++ octopus/machine/__init__.py	(refactored)
+@@ -1,2 +1,2 @@
+-from machine import *
+-from interface import InterfaceSection as ui
++from .machine import *
++from .interface import InterfaceSection as ui
+--- octopus/machine/interface.py	(original)
++++ octopus/machine/interface.py	(refactored)
+@@ -49,9 +49,9 @@
+ 		r = _prop(t)
+ 		r["zero"] = round(start, 1)
+ 		r["max"] = round(interval, 1)
+-		r["data"] = map(compress, t.get(-interval))
++		r["data"] = list(map(compress, t.get(-interval)))
+ 		if colours is not None:
+-			r["colour"] = colours.next()
++			r["colour"] = next(colours)
+ 
+ 		return r
+ 
+@@ -104,7 +104,7 @@
+ 		return {
+ 			"name": self.name,
+ 			"title": self.title,
+-			"traces": [_trace(t) for t in self.traces.itervalues()],
++			"traces": [_trace(t) for t in self.traces.values()],
+ 			"properties": [_prop(p) for p in self.properties if p.type not in ("Image",)],
+ 			"images": [_img(p) for p in self.properties if p.type == "Image"],
+ 			"controls": [_control(c) for c in self.controls]
+@@ -139,7 +139,7 @@
+ 		for p in section.properties:
+ 			self.properties[p.alias] = p
+ 
+-		for t in section.traces.itervalues():
++		for t in section.traces.values():
+ 			for s in t["traces"]:
+ 				self.properties[s.alias] = s
+ 
+@@ -157,7 +157,7 @@
+ 		for p in section.properties:
+ 			del self.properties[p.alias]
+ 
+-		for t in section.traces.itervalues():
++		for t in section.traces.values():
+ 			for s in t["traces"]:
+ 				try:
+ 					del self.properties[s.alias]
+@@ -165,10 +165,10 @@
+ 					pass
+ 
+ 	def output (self):
+-		return [x.output() for x in self.itervalues()]
++		return [x.output() for x in self.values()]
+ 
+ 	def remove_listeners (self):
+-		for c in self.controls.itervalues():
++		for c in self.controls.values():
+ 			c.event -= self.event
+ 
+ 
+--- octopus/machine/machine.py	(original)
++++ octopus/machine/machine.py	(refactored)
+@@ -12,7 +12,7 @@
+ from ..image.data import Image
+ 
+ # Sibling Imports
+-from interface import InterfaceSection
++from .interface import InterfaceSection
+ 
+ __all__ = ["Machine", "Component", "ComponentList", "Stream", "Property"]
+ 
+--- octopus/manufacturer/gilson.py	(original)
++++ octopus/manufacturer/gilson.py	(refactored)
+@@ -12,7 +12,7 @@
+ from ..util import now
+ from ..protocol import basic, gsioc
+ 
+-from gilson_components import layout
++from .gilson_components import layout
+ 
+ #__all__ = ["UVVis151"]
+ 
+@@ -47,7 +47,7 @@
+ 
+ 
+ def _iter_ci_FIFO (s):
+-	for i in xrange(0, len(s), 7):
++	for i in range(0, len(s), 7):
+ 		yield s[i:i + 6]
+ 
+ def _set_output (machine, i):
+@@ -164,7 +164,7 @@
+ 				try:
+ 					state = self.input_map[result[0]]
+ 					time = self._last_contact_update + (int(result[1:6], 16) * 0.01)
+-				except IndexError, KeyError:
++				except IndexError as KeyError:
+ 					raise Exception("Malformed contact event FIFO: " + str(result))
+ 
+ 				self.input1._push("closed" if state & self.A else "open", time)
+@@ -525,7 +525,7 @@
+ 		else:
+ 			rate = "{:05.3f}".format(rate)[:5]
+ 
+-		print "set rate: S" + self._id + rate
++		print("set rate: S" + self._id + rate)
+ 
+ 		return self._machine.protocol.buffered_command(
+ 			"S" + self._id + rate
+@@ -568,7 +568,7 @@
+ 		def initialisation_failed (failure):
+ 			failure.trap(InitializationFailed)
+ 
+-			print "Syringe Initialisation failed. Trying again"
++			print("Syringe Initialisation failed. Trying again")
+ 			return task.deferLater(reactor, 1, self.initialize)
+ 
+ 		# Send commands to initialise the syringe
+--- octopus/manufacturer/knauer.py	(original)
++++ octopus/manufacturer/knauer.py	(refactored)
+@@ -35,13 +35,13 @@
+ 
+ 	def unexpectedMessage (self, line):
+ 		if line == "H":
+-			print "Pump stopped due to an external stop signal"
++			print("Pump stopped due to an external stop signal")
+ 		elif line == "R":
+-			print "External stop signal removed"
++			print("External stop signal removed")
+ 		elif line == "E1":
+-			print "Motor blocked error"
++			print("Motor blocked error")
+ 		elif line == "E2":
+-			print "Manual stop attempt ignored"
++			print("Manual stop attempt ignored")
+ 
+ 
+ class K120 (Machine):
+@@ -97,7 +97,7 @@
+ 
+ 		def interpretFlowrate (result):
+ 			if result[0] is not "F":
+-				print "Knauer Error: F? = %s" % result 
++				print("Knauer Error: F? = %s" % result) 
+ 				return
+ 
+ 			target = float(result[1:]) * 1000
+--- octopus/manufacturer/thalesnano.py	(original)
++++ octopus/manufacturer/thalesnano.py	(refactored)
+@@ -188,7 +188,7 @@
+ 		}
+ 
+ 		def monitor_state ():
+-			for cmd, cb in commands.iteritems():
++			for cmd, cb in commands.items():
+ 				self.protocol.write(cmd).addCallbacks(cb, log.err)
+ 
+ 		self._tick(monitor_state, 1)
+--- octopus/manufacturer/gilson_components/layout.py	(original)
++++ octopus/manufacturer/gilson_components/layout.py	(refactored)
+@@ -9,7 +9,7 @@
+ 	name = "Layout"
+ 
+ 	def __init__ (self, **kwargs):
+-		for k, v in kwargs.iteritems():
++		for k, v in kwargs.items():
+ 			if hasattr (self, k):
+ 				setattr(self, k, v)
+ 
+@@ -49,7 +49,7 @@
+ 		return (x, y, self.z_down)
+ 
+ 	def vials (self):
+-		return range(1, 1 + max)
++		return list(range(1, 1 + max))
+ 
+ grid_layout_50 = GridLayout(name = "10x5", z_up = 0, z_down = 500, x_count = 10, x_zero = 100, y_zero = 100, dx = 100, dy = 100)
+ 
+@@ -91,7 +91,7 @@
+ 		return (x, y, z)
+ 
+ 	def vials ():
+-		return range(1, 15)
++		return list(range(1, 15))
+ 
+ 	layout.xyz = xyz
+ 	layout.vials = vials
+--- octopus/notifier/sms.py	(original)
++++ octopus/notifier/sms.py	(refactored)
+@@ -6,7 +6,7 @@
+ from twisted.python import log
+ 
+ # System Imports
+-from urllib import urlencode
++from urllib.parse import urlencode
+ 
+ # Sibling Imports
+ import util as notifier_util
+--- octopus/protocol/basic.py	(original)
++++ octopus/protocol/basic.py	(refactored)
+@@ -62,7 +62,7 @@
+ 		)
+ 
+ 	def write (self, line, expectReply = True, wait = 0):
+-		command = _Command(self.index.next(), line, expectReply, wait)
++		command = _Command(next(self.index), line, expectReply, wait)
+ 		self.queue.append(command)
+ 
+ 		return command.d
+--- octopus/protocol/gsioc.py	(original)
++++ octopus/protocol/gsioc.py	(refactored)
+@@ -380,7 +380,7 @@
+ 					return d.addCallback(send_char, char)
+ 
+ 			try:
+-				char = string.next()
++				char = next(string)
+ 				# TODO: This may possibly run into call stack overflows...
+ 				# Maybe replace with callLater?
+ 				return self._write(char).addCallback(send_char, char)
+@@ -407,7 +407,7 @@
+ 					try:
+ 						self._update(buffer, now() - send_time)
+ 						return True
+-					except TypeError, e:
++					except TypeError as e:
+ 						# Has not been properly reset
+ 						try:
+ 							def cb (result):
+@@ -621,7 +621,7 @@
+ 
+ 	try:
+ 		while 1:
+-			code = ord(chars.next())
++			code = ord(next(chars))
+ 
+ 			if 35 < code < 52:
+ 				values.extend([current_value] * (code - 35))
+@@ -634,9 +634,9 @@
+ 				current_value = _add(current_value, code - 97)
+ 				values.append(current_value)
+ 			elif 115 < code < 120:
+-				code2 = ord(chars.next())
+-				code3 = ord(chars.next())
+-				code4 = ord(chars.next())
++				code2 = ord(next(chars))
++				code3 = ord(next(chars))
++				code4 = ord(next(chars))
+ 				current_value = \
+ 					((code - 116) * 262114) + \
+ 					((code2 - 36) * 4096) + \
+--- octopus/sequence/__init__.py	(original)
++++ octopus/sequence/__init__.py	(refactored)
+@@ -1,2 +1,2 @@
+-from sequence import *
+-import util
++from .sequence import *
++from . import util
+--- octopus/sequence/control.py	(original)
++++ octopus/sequence/control.py	(refactored)
+@@ -6,8 +6,9 @@
+ from ..util import now
+ 
+ # Sibling Imports
+-import util
+-import error
++from . import util
++from . import error
++import collections
+ 
+ 
+ class Bind (util.Dependent):
+@@ -55,7 +56,7 @@
+ 			return
+ 
+ 		# Use self.process if set
+-		if callable(self.process):
++		if isinstance(self.process, collections.Callable):
+ 			try:
+ 				new_val = self.process(self.expr)
+ 			except NoUpdate:
+--- octopus/sequence/sequence.py	(original)
++++ octopus/sequence/sequence.py	(refactored)
+@@ -12,8 +12,8 @@
+ import re
+ 
+ # Sibling Imports
+-from error import Error, NotRunning, AlreadyRunning, NotPaused, Stopped
+-import util
++from .error import Error, NotRunning, AlreadyRunning, NotPaused, Stopped
++from . import util
+ 
+ # Package Imports
+ from ..util import now, EventEmitter
+@@ -50,7 +50,7 @@
+ 		self.emit("state-changed", item = self, state = value)
+ 
+ 	def __init__ (self, expr = None):
+-		self.id = _counter.next()
++		self.id = next(_counter)
+ 		self.complete = defer.Deferred()
+ 		self.dependents = util.Dependents()
+ 
+@@ -278,7 +278,7 @@
+ 			# Stops execution of child step
+ 			try:
+ 				return defer.maybeDeferred(_StepWithChild._cancel, self, abort)
+-			except NotRunning, Stopped:
++			except NotRunning as Stopped:
+ 				pass
+ 		else:
+ 			# Allows child step to finish normally
+@@ -338,7 +338,7 @@
+ 				return None
+ 			else:
+ 				try:
+-					step = iterator.next()
++					step = next(iterator)
+ 				except StopIteration:
+ 					self._complete(result)
+ 				else:
+@@ -448,7 +448,7 @@
+ 
+ 		try:
+ 			self._step.cancel()
+-		except NotRunning, Stopped:
++		except NotRunning as Stopped:
+ 			pass
+ 
+ 		return self._complete()
+@@ -657,7 +657,7 @@
+ 		try:
+ 			d2 = util.Caller._cancel(self, abort)
+ 			return defer.gatherResults([d, d2])
+-		except AttributeError, NotRunning:
++		except AttributeError as NotRunning:
+ 			return d
+ 
+ 	def _reset (self):
+--- octopus/sequence/shortcuts.py	(original)
++++ octopus/sequence/shortcuts.py	(refactored)
+@@ -5,7 +5,7 @@
+ from twisted.internet import reactor, defer
+ 
+ # Sibling Imports
+-import sequence as s
++from . import sequence as s
+ from ..data import Variable
+ 
+ # To implement:
+--- octopus/sequence/util.py	(original)
++++ octopus/sequence/util.py	(refactored)
+@@ -3,15 +3,16 @@
+ from twisted.python import log, failure
+ 
+ # Sibling Imports
+-from error import NotRunning, AlreadyRunning, NotPaused, Stopped
++from .error import NotRunning, AlreadyRunning, NotPaused, Stopped
+ 
+ # Package Imports
+ from ..constants import State
+ from ..util import EventEmitter
++import collections
+ 
+ 
+ def init_child (parent, child):
+-	from sequence import Sequence
++	from .sequence import Sequence
+ 
+ 	if child is None:
+ 		child = Sequence([])
+@@ -272,7 +273,7 @@
+ 		if isinstance(self._fn, BaseStep):
+ 			self._step = self._fn
+ 
+-		elif callable(self._fn):
++		elif isinstance(self._fn, collections.Callable):
+ 			# Act based on the result of fn().
+ 			result = self._fn(*self._args, **self._kwargs)
+ 
+--- octopus/server/server.py	(original)
++++ octopus/server/server.py	(refactored)
+@@ -16,7 +16,7 @@
+ from autobahn.wamp import exportRpc, WampServerFactory, WampServerProtocol
+ 
+ # Sibling Imports
+-import template
++from . import template
+ 
+ # System Imports
+ import os
+@@ -31,12 +31,12 @@
+ experiments = {}
+ 
+ def register_experiment (id, expt):
+-	print "Registered Expt: " + id
++	print("Registered Expt: " + id)
+ 	
+ 	experiments[id] = expt
+ 
+ def remove_experiment (id):
+-	print "Unregistered Expt: " + id
++	print("Unregistered Expt: " + id)
+ 
+ 	del experiments[id]
+ 
+@@ -190,7 +190,7 @@
+ 
+ 		defers = []
+ 		to_remove = []
+-		for id, expt in experiments.iteritems():
++		for id, expt in experiments.items():
+ 			if expt is None:
+ 				continue
+ 
+@@ -292,11 +292,11 @@
+ 			return "This script is already running"
+ 
+ 		def done (result):
+-			print "Process complete"
+-			print result
++			print("Process complete")
++			print(result)
+ 			_running_scripts.discard(self._script_id)
+ 
+-		print "Running Script: %s" % self._script_path
++		print("Running Script: %s" % self._script_path)
+ 		d = utils.getProcessOutput(self._script_path, reactor = reactor)
+ 		d.addBoth(done)
+ 
+@@ -339,7 +339,7 @@
+ 
+ 			self.factory._subscribeClient(self, BASE + "/events#" + id)
+ 			
+-			print "Monitoring Experiment %s" % id
++			print("Monitoring Experiment %s" % id)
+ 
+ 			def combine (results):
+ 				return {
+@@ -365,7 +365,7 @@
+ 	@exportRpc
+ 	def state (self):
+ 		try:
+-			print "Requesting State"
++			print("Requesting State")
+ 			return self.monitor.callRemote("state")
+ 		except pb.DeadReferenceError:
+ 			raise Exception(BASE + "/error#experiment_disconnected", "Experiment has disconnected")
+@@ -376,7 +376,7 @@
+ 			raise Exception(BASE + "/error#not_monitoring", "You are not connected to an experiment")
+ 
+ 		try:
+-			print "Requesting Set: %s -> %s" % (key, value)
++			print("Requesting Set: %s -> %s" % (key, value))
+ 			return self.monitor.callRemote("set", key, value)
+ 		except pb.DeadReferenceError:
+ 			raise Exception(BASE + "/error#experiment_disconnected", "Experiment has disconnected")
+@@ -387,7 +387,7 @@
+ 			raise Exception(BASE + "/error#not_monitoring", "You are not connected to an experiment")
+ 
+ 		try:
+-			print "Requesting Control Set: %s -> %s" % (control_alias, value)
++			print("Requesting Control Set: %s -> %s" % (control_alias, value))
+ 			return self.monitor.callRemote("control_set", control_alias, value)
+ 		except pb.DeadReferenceError:
+ 			raise Exception(BASE + "/error#experiment_disconnected", "Experiment has disconnected")
+--- octopus/server/tap.py	(original)
++++ octopus/server/tap.py	(refactored)
+@@ -2,7 +2,7 @@
+ from twisted.application import internet, service
+ from twisted.internet import interfaces
+ from twisted.python import usage
+-import server
++from . import server
+ 
+ class Options (usage.Options):
+ 	optParameters = [
+--- octopus/transport/phidgets.py	(original)
++++ octopus/transport/phidgets.py	(refactored)
+@@ -51,7 +51,7 @@
+ 				if protocol.isAttached():
+ 					serial = protocol.getSerialNum()
+ 					name = protocol.getDeviceName()
+-					print("Phidget Device '" + str(name) + "', Serial Number: " + str(serial) + " Connected")
++					print(("Phidget Device '" + str(name) + "', Serial Number: " + str(serial) + " Connected"))
+ 
+ 					defer.returnValue(protocol)
+ 				else:

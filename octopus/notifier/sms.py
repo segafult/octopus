@@ -6,7 +6,7 @@ from twisted.internet.ssl import ClientContextFactory
 from twisted.python import log
 
 # System Imports
-from urllib import urlencode
+from urllib.parse import urlencode
 
 # Sibling Imports
 import util as notifier_util

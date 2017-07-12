@@ -12,19 +12,19 @@ class MyD (Dependent):
 		self.i = i
 
 	def _run (self):
-		print "Dep %d Run" % self.i
+		print("Dep %d Run" % self.i)
 
 	def _pause (self):
-		print "Dep %d Pause" % self.i
+		print("Dep %d Pause" % self.i)
 
 	def _resume (self):
-		print "Dep %d Resume" % self.i
+		print("Dep %d Resume" % self.i)
 
 	def _cancel (self, abort = False):
-		print "Dep %d Cancel" % self.i
+		print("Dep %d Cancel" % self.i)
 
 	def _reset (self):
-		print "Dep %d Reset" % self.i
+		print("Dep %d Reset" % self.i)
 
 e = r._experiment
 d1 = MyD(1)

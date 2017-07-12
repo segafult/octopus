@@ -12,7 +12,7 @@ from ..machine import Machine, Component, Property, Stream, ui
 from ..util import now
 from ..protocol import basic, gsioc
 
-from gilson_components import layout
+from .gilson_components import layout
 
 #__all__ = ["UVVis151"]
 
@@ -47,7 +47,7 @@ class GSIOC (Machine):
 
 
 def _iter_ci_FIFO (s):
-	for i in xrange(0, len(s), 7):
+	for i in range(0, len(s), 7):
 		yield s[i:i + 6]
 
 def _set_output (machine, i):
@@ -164,7 +164,7 @@ class ControlModule506C (Machine):
 				try:
 					state = self.input_map[result[0]]
 					time = self._last_contact_update + (int(result[1:6], 16) * 0.01)
-				except IndexError, KeyError:
+				except IndexError as KeyError:
 					raise Exception("Malformed contact event FIFO: " + str(result))
 
 				self.input1._push("closed" if state & self.A else "open", time)
@@ -525,7 +525,7 @@ class _syringe_piston (Component):
 		else:
 			rate = "{:05.3f}".format(rate)[:5]
 
-		print "set rate: S" + self._id + rate
+		print("set rate: S" + self._id + rate)
 
 		return self._machine.protocol.buffered_command(
 			"S" + self._id + rate
@@ -568,7 +568,7 @@ class _syringe_piston (Component):
 		def initialisation_failed (failure):
 			failure.trap(InitializationFailed)
 
-			print "Syringe Initialisation failed. Trying again"
+			print("Syringe Initialisation failed. Trying again")
 			return task.deferLater(reactor, 1, self.initialize)
 
 		# Send commands to initialise the syringe

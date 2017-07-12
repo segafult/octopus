@@ -49,9 +49,9 @@ def _trace (t):
 		r = _prop(t)
 		r["zero"] = round(start, 1)
 		r["max"] = round(interval, 1)
-		r["data"] = map(compress, t.get(-interval))
+		r["data"] = list(map(compress, t.get(-interval)))
 		if colours is not None:
-			r["colour"] = colours.next()
+			r["colour"] = next(colours)
 
 		return r
 
@@ -104,7 +104,7 @@ class InterfaceSection (object):
 		return {
 			"name": self.name,
 			"title": self.title,
-			"traces": [_trace(t) for t in self.traces.itervalues()],
+			"traces": [_trace(t) for t in self.traces.values()],
 			"properties": [_prop(p) for p in self.properties if p.type not in ("Image",)],
 			"images": [_img(p) for p in self.properties if p.type == "Image"],
 			"controls": [_control(c) for c in self.controls]
@@ -139,7 +139,7 @@ class InterfaceSectionSet (OrderedDict):
 		for p in section.properties:
 			self.properties[p.alias] = p
 
-		for t in section.traces.itervalues():
+		for t in section.traces.values():
 			for s in t["traces"]:
 				self.properties[s.alias] = s
 
@@ -157,7 +157,7 @@ class InterfaceSectionSet (OrderedDict):
 		for p in section.properties:
 			del self.properties[p.alias]
 
-		for t in section.traces.itervalues():
+		for t in section.traces.values():
 			for s in t["traces"]:
 				try:
 					del self.properties[s.alias]
@@ -165,10 +165,10 @@ class InterfaceSectionSet (OrderedDict):
 					pass
 
 	def output (self):
-		return [x.output() for x in self.itervalues()]
+		return [x.output() for x in self.values()]
 
 	def remove_listeners (self):
-		for c in self.controls.itervalues():
+		for c in self.controls.values():
 			c.event -= self.event
 
 

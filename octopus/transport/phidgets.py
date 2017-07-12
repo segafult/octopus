@@ -51,7 +51,7 @@ class Phidget (object):
 				if protocol.isAttached():
 					serial = protocol.getSerialNum()
 					name = protocol.getDeviceName()
-					print("Phidget Device '" + str(name) + "', Serial Number: " + str(serial) + " Connected")
+					print(("Phidget Device '" + str(name) + "', Serial Number: " + str(serial) + " Connected"))
 
 					defer.returnValue(protocol)
 				else:

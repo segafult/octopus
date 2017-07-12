@@ -1,2 +1,2 @@
-from machine import *
-from interface import InterfaceSection as ui
+from .machine import *
+from .interface import InterfaceSection as ui

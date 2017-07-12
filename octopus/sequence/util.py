@@ -3,15 +3,16 @@ from twisted.internet import reactor, defer, task
 from twisted.python import log, failure
 
 # Sibling Imports
-from error import NotRunning, AlreadyRunning, NotPaused, Stopped
+from .error import NotRunning, AlreadyRunning, NotPaused, Stopped
 
 # Package Imports
 from ..constants import State
 from ..util import EventEmitter
+import collections
 
 
 def init_child (parent, child):
-	from sequence import Sequence
+	from .sequence import Sequence
 
 	if child is None:
 		child = Sequence([])
@@ -272,7 +273,7 @@ class Caller (EventEmitter):
 		if isinstance(self._fn, BaseStep):
 			self._step = self._fn
 
-		elif callable(self._fn):
+		elif isinstance(self._fn, collections.Callable):
 			# Act based on the result of fn().
 			result = self._fn(*self._args, **self._kwargs)
 

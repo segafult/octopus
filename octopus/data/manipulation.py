@@ -2,7 +2,7 @@
 import math
 
 # Sibling Imports
-import data
+from . import data
 
 # NumPy
 import numpy as np
@@ -52,9 +52,9 @@ class Function (data.Variable):
 		y_vals = self.interp(start, interval, step)
 
 		try:
-			return zip(x_vals.tolist(), y_vals.tolist())
-		except TypeError, ValueError:
-			return zip(x_vals.tolist(), [None] * len(x_vals))
+			return list(zip(x_vals.tolist(), y_vals.tolist()))
+		except TypeError as ValueError:
+			return list(zip(x_vals.tolist(), [None] * len(x_vals)))
 
 	def interp (self, start, interval, step):
 		raise NotImplementedError

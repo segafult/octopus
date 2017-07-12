@@ -6,8 +6,9 @@ from ..constants import State
 from ..util import now
 
 # Sibling Imports
-import util
-import error
+from . import util
+from . import error
+import collections
 
 
 class Bind (util.Dependent):
@@ -55,7 +56,7 @@ class Bind (util.Dependent):
 			return
 
 		# Use self.process if set
-		if callable(self.process):
+		if isinstance(self.process, collections.Callable):
 			try:
 				new_val = self.process(self.expr)
 			except NoUpdate:

@@ -1,2 +1,2 @@
-from sequence import *
-import util
+from .sequence import *
+from . import util

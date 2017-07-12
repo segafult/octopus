@@ -14,7 +14,7 @@ than a variable.
 from ..util import Event
 
 # Sibling Imports
-import errors
+from . import errors
 
 class Control (object):
 	_counter = 0
@@ -146,10 +146,10 @@ class Select (Control):
 			return self._options
 
 		if hasattr("options", self._variable):
-			return dict(zip(
+			return dict(list(zip(
 				self._variable.options,
 				[s.capitalize() for s in self._variable.options]
-			))
+			)))
 
 	@options.setter
 	def options (self, value):

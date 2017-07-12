@@ -5,13 +5,13 @@ import os
 from twisted.internet import reactor, defer
 
 # Sibling Imports
-from sequence import Step
-import data
-import experiment
-from machine import Machine, ui as machine_ui
-import util
+from .sequence import Step
+from . import data
+from . import experiment
+from .machine import Machine, ui as machine_ui
+from . import util
 
-from sequence.shortcuts import *
+from .sequence.shortcuts import *
 
 _experiment = experiment.Experiment()
 

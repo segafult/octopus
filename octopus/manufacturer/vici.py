@@ -51,7 +51,7 @@ class MultiValve (Machine):
 
 	def move (self, position, direction = "f"):
 		if direction not in self._move_commands:
-			raise "Invalid direction"
+			raise Exception("Invalid direction")
 
 		command = self._move_commands[direction]
 

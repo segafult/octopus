@@ -2,7 +2,7 @@
 from twisted.application import internet, service
 from twisted.internet import interfaces
 from twisted.python import usage
-import server
+from . import server
 
 class Options (usage.Options):
 	optParameters = [

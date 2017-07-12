@@ -188,7 +188,7 @@ class HCube (Machine):
 		}
 
 		def monitor_state ():
-			for cmd, cb in commands.iteritems():
+			for cmd, cb in commands.items():
 				self.protocol.write(cmd).addCallbacks(cb, log.err)
 
 		self._tick(monitor_state, 1)
